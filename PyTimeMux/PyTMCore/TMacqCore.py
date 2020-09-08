@@ -7,7 +7,7 @@ Created on Tue Mar  5 14:13:45 2019
 """
 import PyqtTools.DaqInterface as DaqInt
 import numpy as np
-import HwConf.MainBoard_16x16 as MyConf
+# import HwConf.MainBoard_16x16 as MyConf
 
 
 class ChannelsConfig():
@@ -96,6 +96,7 @@ class ChannelsConfig():
         self.ACGain = ACGain
         self.DCGain = DCGain
         print('Board---->', Board)
+
         if Board == 'MainBoard':
             self.aiChannels = MyConf.Inputs[0]
             self.doColumns = MyConf.Inputs[1]

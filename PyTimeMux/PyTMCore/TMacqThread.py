@@ -11,7 +11,7 @@ import pyqtgraph.parametertree.parameterTypes as pTypes
 import numpy as np
 import PyTM16Core.TM16acqCore as CoreMod
 import PyqtTools.FileModule as FileMod
-
+import sys
 
 SampSettingConf = (
                    {'title': 'Channels Config',
@@ -262,7 +262,7 @@ class SampSetParam(pTypes.GroupParameter):
         self.ChsConfig = self.param('ChsConfig')
         self.RowChannels = self.ChsConfig.param('Channels')
         self.ColChannels = self.ChsConfig.param('DigColumns')
-
+        self.Config = self.param('Board')
 
         # Init Settings
         self.on_Acq_Changed()
@@ -272,6 +272,7 @@ class SampSetParam(pTypes.GroupParameter):
 
         print(self.children())
         # Signals
+        self.Config.sigTreeStateChanged.connect(self.on_Board_Config)
         self.RowChannels.sigTreeStateChanged.connect(self.on_Row_Changed)
         self.ColChannels.sigTreeStateChanged.connect(self.on_Col_Changed)
         self.ChsConfig.param('AcqAC').sigValueChanged.connect(self.on_Acq_Changed)
@@ -280,6 +281,16 @@ class SampSetParam(pTypes.GroupParameter):
         self.SampsCo.sigValueChanged.connect(self.on_Fs_Changed)
         self.nBlocks.sigValueChanged.connect(self.on_Fs_Changed)
         self.Vds.sigValueChanged.connect(self.on_Col_Changed)
+
+    def on_Board_Config(self):
+        print('BoardChanged')
+        print(self.Config)
+        di = os.getcwd()
+        Conf_dir = os.chdir('PyTMCore/HwConf')
+        for root, dirs, files in os.walk(di):
+            if self.Config in files:
+                names = os.path.join(root, name)
+        # inputs = import name
 
     def on_Acq_Changed(self):
         for p in self.ChsConfig.children():
