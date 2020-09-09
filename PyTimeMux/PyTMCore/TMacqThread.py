@@ -11,7 +11,7 @@ import pyqtgraph.parametertree.parameterTypes as pTypes
 import numpy as np
 import PyTM16Core.TM16acqCore as CoreMod
 import PyqtTools.FileModule as FileMod
-import sys
+import HwConfig as BoardConf
 
 SampSettingConf = (
                    {'title': 'Channels Config',
@@ -281,16 +281,6 @@ class SampSetParam(pTypes.GroupParameter):
         self.SampsCo.sigValueChanged.connect(self.on_Fs_Changed)
         self.nBlocks.sigValueChanged.connect(self.on_Fs_Changed)
         self.Vds.sigValueChanged.connect(self.on_Col_Changed)
-
-    def on_Board_Config(self):
-        print('BoardChanged')
-        print(self.Config)
-        di = os.getcwd()
-        Conf_dir = os.chdir('PyTMCore/HwConf')
-        for root, dirs, files in os.walk(di):
-            if self.Config in files:
-                names = os.path.join(root, name)
-        # inputs = import name
 
     def on_Acq_Changed(self):
         for p in self.ChsConfig.children():
