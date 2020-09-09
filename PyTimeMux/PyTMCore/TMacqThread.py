@@ -13,8 +13,7 @@ import PyTM16Core.TM16acqCore as CoreMod
 import PyqtTools.FileModule as FileMod
 import HwConfig as BoardConf
 
-SampSettingConf = (
-                   {'title': 'Channels Config',
+SampSettingConf = ({'title': 'Channels Config',
                     'name': 'ChsConfig',
                     'type': 'group',
                     'children': ({'title': 'Acquire DC',
