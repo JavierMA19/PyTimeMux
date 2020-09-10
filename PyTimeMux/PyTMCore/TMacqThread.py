@@ -9,9 +9,11 @@ Created on Wed Mar  6 12:25:45 2019
 from PyQt5 import Qt
 import pyqtgraph.parametertree.parameterTypes as pTypes
 import numpy as np
-import PyTM16Core.TM16acqCore as CoreMod
+import PyTMCore.TMacqCore as CoreMod
 import PyqtTools.FileModule as FileMod
-import HwConfig as BoardConf
+import PyTMCore.HwConf.HwConfig as BoardConf
+import copy
+
 
 SampSettingConf = ({'title': 'Channels Config',
                     'name': 'ChsConfig',
@@ -39,8 +41,8 @@ SampSettingConf = ({'title': 'Channels Config',
                                   'type': 'list',
                                   'values': ['MainBoard_8x8',
                                              'MainBoard_16x16',
-                                             'MainBoard_Mos2',
-                                             'MB41', 
+                                             'Mos2',
+                                             'MB41',
                                              'MB42'], },
                                  {'tittle': 'Row Channels',
                                   'name': 'Channels',
@@ -111,6 +113,9 @@ SampSettingConf = ({'title': 'Channels Config',
                                   'limits': (-0.1, 0.5)}, ), }
                    )
 
+ChannelParam = {'name': 'Chx',
+                'type': 'bool',
+                'value': True}
 
 ###############################################################################
 
@@ -121,7 +126,7 @@ class SampSetParam(pTypes.GroupParameter):
     Columns = []
     Rows = []
     Acq = {}
-    HwSettings = None
+    HwSettings = {}
 
     def __init__(self, **kwargs):
         super(SampSetParam, self).__init__(**kwargs)
@@ -135,9 +140,10 @@ class SampSetParam(pTypes.GroupParameter):
         self.Vds = self.SampSet.param('Vds')
 
         self.ChsConfig = self.param('ChsConfig')
+        self.Config = self.ChsConfig.param('Board')
         self.RowChannels = self.ChsConfig.param('Channels')
         self.ColChannels = self.ChsConfig.param('DigColumns')
-        self.Config = self.param('Board')
+        
 
         # Init Settings
         self.on_Acq_Changed()
@@ -147,7 +153,7 @@ class SampSetParam(pTypes.GroupParameter):
 
         print(self.children())
         # Signals
-        self.Config.sigTreeStateChanged.connect(self.on_Board_Config)
+        self.Config.sigTreeStateChanged.connect(self.Hardware_Selection)
         self.RowChannels.sigTreeStateChanged.connect(self.on_Row_Changed)
         self.ColChannels.sigTreeStateChanged.connect(self.on_Col_Changed)
         self.ChsConfig.param('AcqAC').sigValueChanged.connect(self.on_Acq_Changed)
@@ -158,9 +164,32 @@ class SampSetParam(pTypes.GroupParameter):
         self.Vds.sigValueChanged.connect(self.on_Col_Changed)
 
     def Hardware_Selection(self):
+        print('Hardware_Selection')
         for k in BoardConf.HwConfig:
-            if k == self.Config:
-                self.HwSettings = BoardConf.k
+            if k == self.Config.value():
+                self.HwSettings = BoardConf.HwConfig[k]
+        self.GetChannelsChildren()
+        self.GetColsChildren()
+        self.on_Fs_Changed()
+
+    def GetChannelsChildren(self):
+        print('GetChannelsChildren')
+        if self.HwSettings:
+            self.RowChannels.clearChildren()
+            for i in self.HwSettings['aiChannels']:
+                cc = copy.deepcopy(ChannelParam)
+                cc['name'] = i
+                print(i)
+                self.RowChannels.addChild(cc)
+
+    def GetColsChildren(self):
+        print('GetColsChildren')
+        if self.HwSettings:
+            self.ColChannels.clearChildren()
+            for i in self.HwSettings['ColOuts']:
+                cc = copy.deepcopy(ChannelParam)
+                cc['name'] = i
+                self.ColChannels.addChild(cc)
 
     def on_Acq_Changed(self):
         for p in self.ChsConfig.children():
@@ -171,11 +200,12 @@ class SampSetParam(pTypes.GroupParameter):
         self.NewConf.emit()
 
     def on_Fs_Changed(self):
-        Ts = 1/self.Fs.value()
-        FsxCh = 1/(Ts*self.SampsCo.value()*len(self.Columns))
-        IntTime = (1/(FsxCh)*self.nBlocks.value())
-        self.SampSet.param('FsxCh').setValue(FsxCh)
-        self.SampSet.param('Inttime').setValue(IntTime)
+        if self.Columns:
+            Ts = 1/self.Fs.value()
+            FsxCh = 1/(Ts*self.SampsCo.value()*len(self.Columns))
+            IntTime = (1/(FsxCh)*self.nBlocks.value())
+            self.SampSet.param('FsxCh').setValue(FsxCh)
+            self.SampSet.param('Inttime').setValue(IntTime)
 
     def on_Row_Changed(self):
         self.Rows = []

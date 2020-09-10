@@ -30,7 +30,7 @@ from PyqtTools.PlotModule import PSDPlotter as PSDPlt
 from PyqtTools.PlotModule import PSDParameters as PSDPltPars
 
 
-import PyTM16Core.TM16acqThread as AcqMod
+import PyTMCore.TMacqThread as AcqMod
 
 
 class MainWindow(Qt.QWidget):

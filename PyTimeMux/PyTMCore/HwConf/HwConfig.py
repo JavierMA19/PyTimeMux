@@ -40,7 +40,7 @@ MainBoard_16x16 = {'aiChannels': {'Ch01': ('ai0', 'ai8'),
                                'Col09': ('line26', 'line27'),
                                'Col12': ('line28', 'line29'),
                                'Col10': ('line30', 'line31'),
-                               },  }
+                               }, }
 
 MainBoard_8x8 = {'aiChannels': {'Ch01': ('ai0', 'ai8'),
                                 'Ch02': ('ai1', 'ai9'),
@@ -67,7 +67,7 @@ MainBoard_8x8 = {'aiChannels': {'Ch01': ('ai0', 'ai8'),
                              'Col6': ('line10', 'line11'),
                              'Col7': ('line12', 'line13'),
                              'Col8': ('line14', 'line15'),
-                            }, }
+                             }, }
 
 Mos2 = {'aiChannels': {'Ch01': ('ai0', 'ai8'),
                        'Ch02': ('ai1', 'ai9'),
@@ -86,23 +86,23 @@ Mos2 = {'aiChannels': {'Ch01': ('ai0', 'ai8'),
                        'Ch15': ('ai22', 'ai30'),
                        'Ch16': ('ai23', 'ai31')},
 
-          'ColOuts': {'Col01': ('line1', ),
-                      'Col02': ('line2', ),
-                      'Col03': ('line3', ),
-                      'Col04': ('line0', ),
-                      'Col05': ('line5', ),
-                      'Col06': ('line7', ),
-                      'Col07': ('line6', ),
-                      'Col08': ('line4', ),
-                      'Col09': ('line8', ),
-                      'Col10': ('line11', ),
-                      'Col11': ('line10', ),
-                      'Col12': ('line9', ),
-                      'Col13': ('line12', ),
-                      'Col14': ('line15', ),
-                      'Col15': ('line14', ),
-                      'Col16': ('line13', ),
-                      }, }
+        'ColOuts': {'Col01': ('line1', ),
+                    'Col02': ('line2', ),
+                    'Col03': ('line3', ),
+                    'Col04': ('line0', ),
+                    'Col05': ('line5', ),
+                    'Col06': ('line7', ),
+                    'Col07': ('line6', ),
+                    'Col08': ('line4', ),
+                    'Col09': ('line8', ),
+                    'Col10': ('line11', ),
+                    'Col11': ('line10', ),
+                    'Col12': ('line9', ),
+                    'Col13': ('line12', ),
+                    'Col14': ('line15', ),
+                    'Col15': ('line14', ),
+                    'Col16': ('line13', ),
+                    }, }
 
 MB41 = {'aiChannels': {'Ch09': ('ai0', 'ai8'),
                        'Ch10': ('ai1', 'ai9'),
@@ -138,7 +138,7 @@ MB41 = {'aiChannels': {'Ch09': ('ai0', 'ai8'),
                     'Col08': ('line26', 'line27'),
                     'Col05': ('line28', 'line29'),
                     'Col06': ('line30', 'line31'),
-                   }, }
+                    }, }
 
 MB42 = {'aiChannels': {'Ch01': ('ai0', 'ai8'),
                        'Ch02': ('ai1', 'ai9'),
@@ -181,11 +181,3 @@ HwConfig = {'MainBoard_16x16': MainBoard_16x16,
             'Mos2': Mos2,
             'MB41': MB41,
             'MB42': MB42}
-
-
-
-
-
-
-
-

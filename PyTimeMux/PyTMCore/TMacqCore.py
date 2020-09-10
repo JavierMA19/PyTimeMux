@@ -7,7 +7,7 @@ Created on Tue Mar  5 14:13:45 2019
 """
 import PyqtTools.DaqInterface as DaqInt
 import numpy as np
-# import HwConf.MainBoard_16x16 as MyConf
+import PyTMCore.HwConf.HwConfig as BoardConf
 
 
 class ChannelsConfig():
@@ -18,14 +18,13 @@ class ChannelsConfig():
     ChNamesList = None
     AnalogInputs = None
     DigitalOutputs = None
+    MyConf = None
 
     # Events list
     DataEveryNEvent = None
     DataDoneEvent = None
 
-    ClearSig = np.zeros((1, len(MyConf.Inputs[1])),
-                        dtype=np.bool).astype(np.uint8)
-    ClearSig = np.hstack((ClearSig, ClearSig))
+
 
     def _InitAnalogInputs(self):
         print('InitAnalogInputs')
@@ -85,7 +84,7 @@ class ChannelsConfig():
     def __init__(self, Channels, DigColumns,
                  AcqDC=True, AcqAC=True,
                  ChVds='ao0', ChVs='ao1',
-                 ACGain=1.1e5, DCGain=10e3, Board='MainBoard'):
+                 ACGain=1.1e5, DCGain=10e3, Board='MB41'):
         print('InitChannels')
         self._InitAnalogOutputs(ChVds=ChVds, ChVs=ChVs)
 
@@ -97,15 +96,14 @@ class ChannelsConfig():
         self.DCGain = DCGain
         print('Board---->', Board)
 
-        if Board == 'MainBoard':
-            self.aiChannels = MyConf.Inputs[0]
-            self.doColumns = MyConf.Inputs[1]
-        else:
-            self.aiChannels = MyConf.Inputs[0]
-            self.doColumns = MyConf.Inputs[1]
+        self.MyConf = BoardConf.HwConfig[Board]
+        self.aiChannels = self.MyConf['aiChannels']
+        self.doColumns = self.MyConf['ColOuts']
 
         self._InitAnalogInputs()
-
+        # self.ClearSig = np.zeros((1, len(MyConf['ColOuts'])),
+        #                 dtype=np.bool).astype(np.uint8)
+        # self.ClearSig = np.hstack((ClearSig, ClearSig))
         self.DigColumns = sorted(DigColumns)
         self._InitDigitalOutputs()
 
