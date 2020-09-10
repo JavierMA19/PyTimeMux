@@ -63,8 +63,8 @@ class ChannelsConfig():
         # for digc in sorted(self.doColumns):
             print(digc)
             DOChannels.append(self.doColumns[digc][0])
-#            DOChannels.append(doColumns[digc][0])
-            DOChannels.append(self.doColumns[digc][1])
+            if len(self.doColumns[digc]) > 1:
+                DOChannels.append(self.doColumns[digc][1])
         print(DOChannels)
 
 #        DOChannels = []
@@ -75,18 +75,21 @@ class ChannelsConfig():
 
         self.DigitalOutputs = DaqInt.WriteDigital(Channels=DOChannels)
 
-    def _InitAnalogOutputs(self, ChVds, ChVs):
+    def _InitAnalogOutputs(self, ChVds, ChVs, ChAo2, ChAo3):
         print('ChVds ->', ChVds)
         print('ChVs ->', ChVs)
         self.VsOut = DaqInt.WriteAnalog((ChVs,))
         self.VdsOut = DaqInt.WriteAnalog((ChVds,))
+        self.AO2Out = DaqInt.WriteAnalog((ChAo2,))
+        self.AO3Out = DaqInt.WriteAnalog((ChAo3,))
+
 
     def __init__(self, Channels, DigColumns,
                  AcqDC=True, AcqAC=True,
                  ChVds='ao0', ChVs='ao1',
                  ACGain=1.1e5, DCGain=10e3, Board='MB41'):
         print('InitChannels')
-        self._InitAnalogOutputs(ChVds=ChVds, ChVs=ChVs)
+        # self._InitAnalogOutputs(ChVds=ChVds, ChVs=ChVs)
 
         self.ChNamesList = sorted(Channels)
         print(self.ChNamesList)
@@ -99,6 +102,12 @@ class ChannelsConfig():
         self.MyConf = BoardConf.HwConfig[Board]
         self.aiChannels = self.MyConf['aiChannels']
         self.doColumns = self.MyConf['ColOuts']
+        self.aoChannels = self.MyConf['aoChannels']
+        self._InitAnalogOutputs(ChVds=self.aoChannels['ChVds'],
+                                ChVs=self.aoChannels['ChVs'],
+                                ChAo2=self.aoChannels['ChAo2'],
+                                ChAo3=self.aoChannels['ChAo3'],
+                                )
 
         self._InitAnalogInputs()
         # self.ClearSig = np.zeros((1, len(MyConf['ColOuts'])),
