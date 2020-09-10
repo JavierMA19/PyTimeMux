@@ -80,9 +80,10 @@ class ChannelsConfig():
         print('ChVs ->', ChVs)
         self.VsOut = DaqInt.WriteAnalog((ChVs,))
         self.VdsOut = DaqInt.WriteAnalog((ChVds,))
-        self.AO2Out = DaqInt.WriteAnalog((ChAo2,))
-        self.AO3Out = DaqInt.WriteAnalog((ChAo3,))
-
+        if ChAo2:
+            self.AO2Out = DaqInt.WriteAnalog((ChAo2,))
+        if ChAo3:
+            self.AO3Out = DaqInt.WriteAnalog((ChAo3,))
 
     def __init__(self, Channels, DigColumns,
                  AcqDC=True, AcqAC=True,

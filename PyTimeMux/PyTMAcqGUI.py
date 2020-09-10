@@ -62,8 +62,6 @@ class MainWindow(Qt.QWidget):
         self.SamplingPar.Fs.sigValueChanged.connect(self.on_FsChanged)
         self.SamplingPar.FsxCh.sigValueChanged.connect(self.on_FsxChChanged)
 
-        # self.PlotParams = PltMod.PlotterParameters(name='Plot options')
-        # self.Parameters.addChild(self.PlotParams)
         self.PlotParams = TimePltPars(name='TimePlt',
                               title='Time Plot Options')
 
@@ -73,16 +71,11 @@ class MainWindow(Qt.QWidget):
         self.RawPlotParams = TimePltPars(name='RawPlot')
         self.Parameters.addChild(self.RawPlotParams)
 
-        # self.PSDParams = PltMod.PSDParameters(name='PSD Options')
-        # self.PSDParams.NewConf.connect(self.on_NewPSDConf)
-        # self.Parameters.addChild(self.PSDParams)
         self.PsdPlotParams = PSDPltPars(name='PSDPlt',
                                         title='PSD Plot Options')
         self.Parameters.addChild(self.PsdPlotParams)
 
         self.PsdPlotParams.NewConf.connect(self.on_NewPSDConf)
-
-        # self.Parameters.sigTreeStateChanged.connect(self.on_pars_changed)
 
         self.treepar = ParameterTree()
         self.treepar.setParameters(self.Parameters, showTop=False)
@@ -137,22 +130,6 @@ class MainWindow(Qt.QWidget):
             if self.threadAcq:
                 Vgs = self.threadAcq.DaqInterface.Vgs
                 self.threadAcq.DaqInterface.SetBias(Vgs=Vgs, Vds=data)
-
-        # if childName == 'Plot options.RefreshTime':
-        #     if self.threadPlotter is not None:
-        #         self.threadPlotter.SetRefreshTime(data)
-
-        # if childName == 'Plot options.ViewTime':
-        #     if self.threadPlotter is not None:
-        #         self.threadPlotter.SetViewTime(data)
-
-        # if childName == 'Raw Plot.ViewTime':
-        #     if self.threadPlotterRaw is not None:
-        #         self.threadPlotterRaw.SetViewTime(data)
-
-        # if childName == 'Raw Plot.RefreshTime':
-        #     if self.threadPlotterRaw is not None:
-        #         self.threadPlotterRaw.SetRefreshTime(data)
 
     def on_NewPSDConf(self):
         if self.threadPSDPlotter is not None:
