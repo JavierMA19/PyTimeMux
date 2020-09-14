@@ -131,6 +131,7 @@ class ChannelsConfig():
 
     def StartAcquisition(self, Fs, nSampsCo, nBlocks, Vgs, Vds, **kwargs):
         print('StartAcquisition')
+        print(**kwargs)
         self.SetBias(Vgs=Vgs, Vds=Vds)
         self.SetDigitalOutputs(nSampsCo=nSampsCo)
         print('DSig set')

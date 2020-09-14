@@ -52,7 +52,8 @@ SampSettingConf = ({'title': 'Channels Config',
                                  {'tittle': 'Columns Channels',
                                   'name': 'DigColumns',
                                   'type': 'group',
-                                  'children': (), },
+                                  'children': (), }
+
                                  ), },
 
                    {'name': 'Sampling Settings',
@@ -110,12 +111,21 @@ SampSettingConf = ({'title': 'Channels Config',
                                   'type': 'float',
                                   'value': 0.1,
                                   'step': 0.1,
-                                  'limits': (-0.1, 0.5)}, ), }
+                                  'limits': (-0.1, 0.5)},
+                                 {'tittle': 'Analog Outputs',
+                                  'name': 'AnalogOutputs',
+                                  'type': 'group', 
+                                  'children': (), }, , ), }
+), }
                    )
 
 ChannelParam = {'name': 'Chx',
                 'type': 'bool',
                 'value': True}
+
+AnalogOutParam = {'name': 'Aox',
+                  'type': 'float',
+                  'value': 0.1}
 
 ###############################################################################
 
@@ -137,7 +147,7 @@ class SampSetParam(pTypes.GroupParameter):
         self.FsxCh = self.SampSet.param('FsxCh')
         self.SampsCo = self.SampSet.param('nSampsCo')
         self.nBlocks = self.SampSet.param('nBlocks')
-        self.Vds = self.SampSet.param('Vds')
+        self.AnalogOutputs = self.SampSet.param('AnalogOutputs')
 
         self.ChsConfig = self.param('ChsConfig')
         self.Config = self.ChsConfig.param('Board')
@@ -156,12 +166,12 @@ class SampSetParam(pTypes.GroupParameter):
         self.Config.sigTreeStateChanged.connect(self.Hardware_Selection)
         self.RowChannels.sigTreeStateChanged.connect(self.on_Row_Changed)
         self.ColChannels.sigTreeStateChanged.connect(self.on_Col_Changed)
+        # self.AnalogOutputs.sigTreeStateChanged.connect(self.on_Ao_Changed)
         self.ChsConfig.param('AcqAC').sigValueChanged.connect(self.on_Acq_Changed)
         self.ChsConfig.param('AcqDC').sigValueChanged.connect(self.on_Acq_Changed)
         self.Fs.sigValueChanged.connect(self.on_Fs_Changed)
         self.SampsCo.sigValueChanged.connect(self.on_Fs_Changed)
         self.nBlocks.sigValueChanged.connect(self.on_Fs_Changed)
-        self.Vds.sigValueChanged.connect(self.on_Col_Changed)
 
     def Hardware_Selection(self):
         print('Hardware_Selection')
@@ -170,6 +180,7 @@ class SampSetParam(pTypes.GroupParameter):
                 self.HwSettings = BoardConf.HwConfig[k]
         self.GetChannelsChildren()
         self.GetColsChildren()
+        self.GetAnalogOutputs()
         self.on_Fs_Changed()
 
     def GetChannelsChildren(self):
@@ -190,6 +201,18 @@ class SampSetParam(pTypes.GroupParameter):
                 cc = copy.deepcopy(ChannelParam)
                 cc['name'] = i
                 self.ColChannels.addChild(cc)
+
+    def GetAnalogOutputs(self):
+        print('GetAnalogOutputs')
+        if self.HwSettings:
+            self.AnalogOutputs.clearChildren()
+            for i in self.HwSettings['aoChannels']:
+                cc = copy.deepcopy(AnalogOutParam)
+                cc['name'] = i
+                self.AnalogOutputs.addChild(cc)
+
+    def on_Ao_Changed(self):
+        for p in self.AnalogOutputs.children()
 
     def on_Acq_Changed(self):
         for p in self.ChsConfig.children():
