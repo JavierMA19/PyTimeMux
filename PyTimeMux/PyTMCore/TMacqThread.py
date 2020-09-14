@@ -115,8 +115,7 @@ SampSettingConf = ({'title': 'Channels Config',
                                  {'tittle': 'Analog Outputs',
                                   'name': 'AnalogOutputs',
                                   'type': 'group', 
-                                  'children': (), }, , ), }
-), }
+                                  'children': (), } , ), }
                    )
 
 ChannelParam = {'name': 'Chx',
@@ -160,13 +159,14 @@ class SampSetParam(pTypes.GroupParameter):
         self.on_Row_Changed()
         self.on_Col_Changed()
         self.on_Fs_Changed()
+        self.on_Ao_Changed()
 
         print(self.children())
         # Signals
         self.Config.sigTreeStateChanged.connect(self.Hardware_Selection)
         self.RowChannels.sigTreeStateChanged.connect(self.on_Row_Changed)
         self.ColChannels.sigTreeStateChanged.connect(self.on_Col_Changed)
-        # self.AnalogOutputs.sigTreeStateChanged.connect(self.on_Ao_Changed)
+        self.AnalogOutputs.sigTreeStateChanged.connect(self.on_Ao_Changed)
         self.ChsConfig.param('AcqAC').sigValueChanged.connect(self.on_Acq_Changed)
         self.ChsConfig.param('AcqDC').sigValueChanged.connect(self.on_Acq_Changed)
         self.Fs.sigValueChanged.connect(self.on_Fs_Changed)
@@ -207,12 +207,10 @@ class SampSetParam(pTypes.GroupParameter):
         if self.HwSettings:
             self.AnalogOutputs.clearChildren()
             for i in self.HwSettings['aoChannels']:
-                cc = copy.deepcopy(AnalogOutParam)
-                cc['name'] = i
-                self.AnalogOutputs.addChild(cc)
-
-    def on_Ao_Changed(self):
-        for p in self.AnalogOutputs.children()
+                if i == 'ChAo2' or i =='ChAo3':
+                    cc = copy.deepcopy(AnalogOutParam)
+                    cc['name'] = i
+                    self.AnalogOutputs.addChild(cc)
 
     def on_Acq_Changed(self):
         for p in self.ChsConfig.children():
@@ -243,6 +241,12 @@ class SampSetParam(pTypes.GroupParameter):
             if p.value() is True:
                 self.Columns.append(p.name())
         self.on_Fs_Changed()
+        self.NewConf.emit()
+
+    def on_Ao_Changed(self):
+        self.Ao = {}
+        for p in self.AnalogOutputs.children():
+                self.Ao[p.name()] = p.value()
         self.NewConf.emit()
 
     def GetRowNames(self):
@@ -282,7 +286,13 @@ class SampSetParam(pTypes.GroupParameter):
     def GetSampKwargs(self):
         GenKwargs = {}
         for p in self.SampSet.children():
-            GenKwargs[p.name()] = p.value()
+            print(p.name(), '-->', p.value())
+            if p.name() == 'AnalogOutputs':
+                GenKwargs[p.name()] = self.Ao
+                print(self.Ao)
+            else:
+                GenKwargs[p.name()] = p.value()
+        print(GenKwargs)
         return GenKwargs
 
     def GetChannelsConfigKwargs(self):
@@ -308,6 +318,8 @@ class DataAcquisitionThread(Qt.QThread):
         self.DaqInterface = CoreMod.ChannelsConfig(**ChannelsConfigKW)
         self.DaqInterface.DataEveryNEvent = self.NewData
         self.SampKw = SampKw
+        print('SampKWKWKW')
+        print(SampKw)
         self.AvgIndex = AvgIndex
 
     def run(self, *args, **kwargs):

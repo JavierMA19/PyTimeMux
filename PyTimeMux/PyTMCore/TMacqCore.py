@@ -129,10 +129,13 @@ class ChannelsConfig():
         else:
             self.nChannels = len(self.MuxChannelNames)
 
-    def StartAcquisition(self, Fs, nSampsCo, nBlocks, Vgs, Vds, **kwargs):
+    def StartAcquisition(self, Fs, nSampsCo, nBlocks, Vgs, Vds, AnalogOutputs, **kwargs):
         print('StartAcquisition')
-        print(**kwargs)
-        self.SetBias(Vgs=Vgs, Vds=Vds)
+        print(AnalogOutputs)
+        if AnalogOutputs:
+            ChAo2 = AnalogOutputs['ChAo2']
+            ChAo3 = AnalogOutputs['ChAo3']
+        self.SetBias(Vgs=Vgs, Vds=Vds, ChAo2=ChAo2, ChAo3=ChAo3)
         self.SetDigitalOutputs(nSampsCo=nSampsCo)
         print('DSig set')
         self.nBlocks = nBlocks
@@ -143,10 +146,14 @@ class ChannelsConfig():
         self.AnalogInputs.ReadContData(Fs=Fs,
                                        EverySamps=EveryN)
 
-    def SetBias(self, Vgs, Vds):
+    def SetBias(self, Vgs, Vds, ChAo2, ChAo3):
         print('ChannelsConfig SetBias Vgs ->', Vgs, 'Vds ->', Vds)
         self.VdsOut.SetVal(Vds)
         self.VsOut.SetVal(-Vgs)
+        if ChAo2:
+            self.AO2Out.SetVal(ChAo2)
+        if ChAo3:
+            self.AO3Out.SetVal(ChAo3)
         self.BiasVd = Vds-Vgs
         self.Vgs = Vgs
         self.Vds = Vds
