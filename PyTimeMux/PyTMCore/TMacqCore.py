@@ -19,6 +19,8 @@ class ChannelsConfig():
     AnalogInputs = None
     DigitalOutputs = None
     MyConf = None
+    AO2Out = None
+    AO3Out = None
 
     # Events list
     DataEveryNEvent = None
@@ -135,6 +137,9 @@ class ChannelsConfig():
         if AnalogOutputs:
             ChAo2 = AnalogOutputs['ChAo2']
             ChAo3 = AnalogOutputs['ChAo3']
+        else:
+            ChAo2 = None
+            ChAo3 = None
         self.SetBias(Vgs=Vgs, Vds=Vds, ChAo2=ChAo2, ChAo3=ChAo3)
         self.SetDigitalOutputs(nSampsCo=nSampsCo)
         print('DSig set')
@@ -147,12 +152,13 @@ class ChannelsConfig():
                                        EverySamps=EveryN)
 
     def SetBias(self, Vgs, Vds, ChAo2, ChAo3):
-        print('ChannelsConfig SetBias Vgs ->', Vgs, 'Vds ->', Vds)
+        print('ChannelsConfig SetBias Vgs ->', Vgs, 'Vds ->', Vds,
+              'Ao2 ->', ChAo2, 'Ao3 ->', ChAo3,)
         self.VdsOut.SetVal(Vds)
         self.VsOut.SetVal(-Vgs)
-        if ChAo2:
+        if self.AO2Out:
             self.AO2Out.SetVal(ChAo2)
-        if ChAo3:
+        if self.AO3Out:
             self.AO3Out.SetVal(ChAo3)
         self.BiasVd = Vds-Vgs
         self.Vgs = Vgs
@@ -230,7 +236,7 @@ class ChannelsConfig():
 
     def Stop(self):
         print('Stopppp')
-        self.SetBias(Vgs=0, Vds=0)
+        self.SetBias(Vgs=0, Vds=0, ChAo2=0, ChAo3=0)
         self.AnalogInputs.StopContData()
         if self.DigitalOutputs is not None:
             print('Clear Digital')

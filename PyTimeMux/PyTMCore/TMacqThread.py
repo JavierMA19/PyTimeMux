@@ -206,8 +206,9 @@ class SampSetParam(pTypes.GroupParameter):
         print('GetAnalogOutputs')
         if self.HwSettings:
             self.AnalogOutputs.clearChildren()
-            for i in self.HwSettings['aoChannels']:
-                if i == 'ChAo2' or i =='ChAo3':
+            for i, k in self.HwSettings['aoChannels'].items():
+                print(i, k)
+                if any([i == 'ChAo2', i == 'ChAo3']) and k is not None:
                     cc = copy.deepcopy(AnalogOutParam)
                     cc['name'] = i
                     self.AnalogOutputs.addChild(cc)
