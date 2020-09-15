@@ -131,7 +131,8 @@ class ChannelsConfig():
         else:
             self.nChannels = len(self.MuxChannelNames)
 
-    def StartAcquisition(self, Fs, nSampsCo, nBlocks, Vgs, Vds, AnalogOutputs, **kwargs):
+    def StartAcquisition(self, Fs, nSampsCo, nBlocks, Vgs, Vds,
+                         AnalogOutputs, **kwargs):
         print('StartAcquisition')
         print(AnalogOutputs)
         if AnalogOutputs:
@@ -173,15 +174,20 @@ class ChannelsConfig():
             for i, n in enumerate(self.DigColumns):
                 if n == iCol:
                     Lout[0, nSampsCo * i: nSampsCo * (i + 1)] = True
-                Cout = np.vstack((Lout, ~Lout))
+                if len(self.doColumns[iCol]) > 1:
+                    Cout = np.vstack((Lout, ~Lout))
+                else:
+                    Cout = Lout
             DOut = np.vstack((DOut, Cout)) if DOut.size else Cout
 
         SortDInds = []
         for line in DOut[0:-1:2, :]:
             if True in line:
                 SortDInds.append(np.where(line))
-
         self.SortDInds = SortDInds
+        print(DOut.astype(np.uint8))
+        print(len(DOut))
+        print(DOut[-1])
         self.DigitalOutputs.SetContSignal(Signal=DOut.astype(np.uint8))
 
     def _SortChannels(self, data, SortDict):
