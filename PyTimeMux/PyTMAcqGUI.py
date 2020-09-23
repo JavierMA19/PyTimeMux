@@ -197,6 +197,8 @@ class MainWindow(Qt.QWidget):
             self.threadAcq.start()
 
             PlotterKwargs = self.PlotParams.GetParams()
+            PlotterRawKwargs = self.RawPlotParams.GetParams()
+            print(PlotterRawKwargs['nChannels'])
 
             FileName = self.FileParameters.FilePath()
             print('Filename', FileName)
