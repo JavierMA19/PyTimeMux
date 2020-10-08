@@ -187,7 +187,7 @@ class SampSetParam(pTypes.GroupParameter):
         print('GetChannelsChildren')
         if self.HwSettings:
             self.RowChannels.clearChildren()
-            for i in self.HwSettings['aiChannels']:
+            for i in sorted(self.HwSettings['aiChannels']):
                 cc = copy.deepcopy(ChannelParam)
                 cc['name'] = i
                 print(i)
@@ -197,7 +197,7 @@ class SampSetParam(pTypes.GroupParameter):
         print('GetColsChildren')
         if self.HwSettings:
             self.ColChannels.clearChildren()
-            for i in self.HwSettings['ColOuts']:
+            for i in sorted(self.HwSettings['ColOuts']):
                 cc = copy.deepcopy(ChannelParam)
                 cc['name'] = i
                 self.ColChannels.addChild(cc)

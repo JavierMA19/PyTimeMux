@@ -61,12 +61,17 @@ class ChannelsConfig():
         print(self.DigColumns)
         DOChannels = []
 
-        for digc in sorted(self.DigColumns):
+        # for digc in sorted(self.DigColumns):
+        for k, v in self.doColumns.items():
+            DOChannels.append(v[0])
+            if len(v) > 1:
+                DOChannels.append(v[1])
+                
         # for digc in sorted(self.doColumns):
-            print(digc)
-            DOChannels.append(self.doColumns[digc][0])
-            if len(self.doColumns[digc]) > 1:
-                DOChannels.append(self.doColumns[digc][1])
+        #     print(digc)
+        #     DOChannels.append(self.doColumns[digc][0])
+        #     if len(self.doColumns[digc]) > 1:
+        #         DOChannels.append(self.doColumns[digc][1])
         print(DOChannels)
 
 #        DOChannels = []

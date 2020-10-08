@@ -196,7 +196,6 @@ class MainWindow(Qt.QWidget):
             self.threadAcq.NewMuxData.connect(self.on_NewSample)
             self.threadAcq.start()
 
-            PlotterKwargs = self.PlotParams.GetParams()
             PlotterRawKwargs = self.RawPlotParams.GetParams()
             print(PlotterRawKwargs['nChannels'])
 
