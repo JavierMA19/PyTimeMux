@@ -67,18 +67,7 @@ class ChannelsConfig():
             if len(v) > 1:
                 DOChannels.append(v[1])
                 
-        # for digc in sorted(self.doColumns):
-        #     print(digc)
-        #     DOChannels.append(self.doColumns[digc][0])
-        #     if len(self.doColumns[digc]) > 1:
-        #         DOChannels.append(self.doColumns[digc][1])
         print(DOChannels)
-
-#        DOChannels = []
-#
-#        for digc in self.DigColumns:
-#            DOChannels.append(doColumns[digc][0])
-#            DOChannels.append(doColumns[digc][1])
 
         self.DigitalOutputs = DaqInt.WriteDigital(Channels=DOChannels)
 
@@ -118,9 +107,6 @@ class ChannelsConfig():
                                 )
 
         self._InitAnalogInputs()
-        # self.ClearSig = np.zeros((1, len(MyConf['ColOuts'])),
-        #                 dtype=np.bool).astype(np.uint8)
-        # self.ClearSig = np.hstack((ClearSig, ClearSig))
         self.DigColumns = sorted(DigColumns)
         self._InitDigitalOutputs()
 
@@ -190,9 +176,47 @@ class ChannelsConfig():
             if True in line:
                 SortDInds.append(np.where(line))
         self.SortDInds = SortDInds
-        print(DOut.astype(np.uint8))
-        print(len(DOut))
-        print(DOut[-1])
+        self.DigitalOutputs.SetContSignal(Signal=DOut.astype(np.uint8))
+
+    def SetDigitalOutputs(self, nSampsCo):
+        hwLinesMap = {}
+        for ColName, hwLine in self.doColumns.items():
+            il = int(hwLine[0][4:])
+            hwLinesMap[il] = (ColName, hwLine)
+        
+        # Gen inverted control output, should be the next one of the digital line ('lineX', 'lineX+1')
+        if len(self.doColumns[ColName]) > 1:
+            GenInvert = True
+        else:
+            GenInvert = False
+
+        # Gen sorted indexes for demuxing
+        SortIndDict = {}
+        for ic, coln in enumerate(sorted(self.DigColumns)):
+            SortIndDict[coln] = ic
+        
+        DOut = np.array([], dtype=np.bool)
+        SortDInds = np.zeros((len(self.DigColumns), nSampsCo), dtype=np.int64)
+        SwitchOrder = 0
+        for il, (nLine, (LineName, hwLine)) in enumerate(sorted(hwLinesMap.items())):
+            Lout = np.zeros((1, nSampsCo*len(self.DigColumns)), dtype=np.bool)    
+            if LineName in self.DigColumns:
+                # print(il, nLine, hwLine, LineName)
+                Lout[0, nSampsCo * SwitchOrder: nSampsCo * (SwitchOrder + 1)] = True
+                SortDInds[SortIndDict[LineName], : ] = np.arange(nSampsCo * SwitchOrder,
+                                                             nSampsCo * (SwitchOrder + 1) )
+                SwitchOrder += 1
+            
+            if GenInvert:
+                Cout = np.vstack((Lout, ~Lout))
+            else:
+                Cout = Lout        
+            DOut = np.vstack((DOut, Cout)) if DOut.size else Cout
+
+        SortDIndsL = [inds for inds in SortDInds] 
+        Dout = DOut.astype(np.uint8)
+
+        self.SortDInds = SortDInds
         self.DigitalOutputs.SetContSignal(Signal=DOut.astype(np.uint8))
 
     def _SortChannels(self, data, SortDict):

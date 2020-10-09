@@ -56,10 +56,7 @@ doColumns = HwMap['ColOuts']
 # columns to Mux
 DigColumns = (
                 'Col01',
-                'Col02',
-                'Col03',
                 'Col04',
-                'Col10',
                 'Col11',
                 )
 
@@ -105,14 +102,14 @@ for il, (nLine, (LineName, hwLine)) in enumerate(sorted(hwLinesMap.items())):
     
 # # Vigila amb el sorting dels canal per demux... segurament dependrà de l'ordre de les lines
 
-# if GenInvert:
-#     for line in DOut[0:-1:2, :]:
-#         if True in line:
-#             SortDInds.append(np.where(line))
-# else:
-#     for line in DOut:
-#         if True in line:
-#             SortDInds.append(np.where(line))
+if GenInvert:
+    for line in DOut[0:-1:2, :]:
+        if True in line:
+            SortDInds.append(np.where(line))
+else:
+    for line in DOut:
+        if True in line:
+            SortDInds.append(np.where(line))
 
 SortDIndsL = [inds for inds in SortDInds]
     
