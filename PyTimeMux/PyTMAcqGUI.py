@@ -131,6 +131,18 @@ class MainWindow(Qt.QWidget):
                 Vgs = self.threadAcq.DaqInterface.Vgs
                 self.threadAcq.DaqInterface.SetBias(Vgs=Vgs, Vds=data)
 
+        if childName == 'SampSettingConf.Sampling Settings.ChAo2':
+            if self.threadAcq:
+                Vds = self.threadAcq.DaqInterface.Vds
+                Vgs = self.threadAcq.DaqInterface.Vgs
+                self.threadAcq.DaqInterface.SetBias(Vgs=Vgs, Vds=Vds, ChAo2=data)
+
+        if childName == 'SampSettingConf.Sampling Settings.ChAo3':
+            if self.threadAcq:
+                Vgs = self.threadAcq.DaqInterface.Vgs
+                Vds = self.threadAcq.DaqInterface.Vds
+                self.threadAcq.DaqInterface.SetBias(Vgs=Vgs, Vds=Vds, ChAo3=data)
+
     def on_NewPSDConf(self):
         if self.threadPSDPlotter is not None:
             nFFT = self.PsdPlotParams.param('nFFT').value()

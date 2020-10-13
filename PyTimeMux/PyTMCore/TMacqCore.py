@@ -156,28 +156,6 @@ class ChannelsConfig():
         self.Vgs = Vgs
         self.Vds = Vds
 
-    # def SetDigitalOutputs(self, nSampsCo):
-    #     print('SetDigitalOutputs')
-    #     DOut = np.array([], dtype=np.bool)
-
-    #     for nCol, iCol in zip(range(len(self.doColumns)), sorted(list(self.doColumns.keys()))):
-    #         Lout = np.zeros((1, nSampsCo*len(self.DigColumns)), dtype=np.bool)
-    #         for i, n in enumerate(self.DigColumns):
-    #             if n == iCol:
-    #                 Lout[0, nSampsCo * i: nSampsCo * (i + 1)] = True
-    #             if len(self.doColumns[iCol]) > 1:
-    #                 Cout = np.vstack((Lout, ~Lout))
-    #             else:
-    #                 Cout = Lout
-    #         DOut = np.vstack((DOut, Cout)) if DOut.size else Cout
-
-    #     SortDInds = []
-    #     for line in DOut[0:-1:2, :]:
-    #         if True in line:
-    #             SortDInds.append(np.where(line))
-    #     self.SortDInds = SortDInds
-    #     self.DigitalOutputs.SetContSignal(Signal=DOut.astype(np.uint8))
-
     def SetDigitalOutputs(self, nSampsCo):
         hwLinesMap = {}
         for ColName, hwLine in self.doColumns.items():

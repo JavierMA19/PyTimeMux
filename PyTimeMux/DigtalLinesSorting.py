@@ -27,23 +27,23 @@ HwMap = {'aiChannels': {'Ch01': ('ai0', 'ai8'),
                                   'ChAo2': None,
                                   'ChAo3': None, },
 
-                   'ColOuts': {'Col05': ('line0', 'line1'),
-                               'Col06': ('line2', 'line3'),
-                               'Col08': ('line4', 'line5'),
-                               'Col07': ('line6', 'line7'),
-                               'Col02': ('line8', 'line9'),
-                               'Col04': ('line10', 'line11'),
-                               'Col01': ('line12', 'line13'),
-                               'Col03': ('line14', 'line15'),
-                               'Col16': ('line16', 'line17'),
-                               'Col15': ('line18', 'line19'),
-                               'Col13': ('line20', 'line21'),
-                               'Col14': ('line22', 'line23'),
-                               'Col11': ('line24', 'line25'),
-                               'Col09': ('line26', 'line27'),
-                               'Col12': ('line28', 'line29'),
-                               'Col10': ('line30', 'line31'),
-                               }, }
+        'ColOuts': {'Col01': ('line1', ),
+                    'Col02': ('line2', ),
+                    'Col03': ('line3', ),
+                    'Col04': ('line0', ),
+                    'Col05': ('line5', ),
+                    'Col06': ('line7', ),
+                    'Col07': ('line6', ),
+                    'Col08': ('line4', ),
+                    'Col09': ('line8', ),
+                    'Col10': ('line11', ),
+                    'Col11': ('line10', ),
+                    'Col12': ('line9', ),
+                    'Col13': ('line12', ),
+                    'Col14': ('line15', ),
+                    'Col15': ('line14', ),
+                    'Col16': ('line13', ),
+                    }, }
 
 import numpy as np
 
@@ -56,8 +56,7 @@ doColumns = HwMap['ColOuts']
 # columns to Mux
 DigColumns = (
                 'Col01',
-                'Col04',
-                'Col11',
+                'Col02',
                 )
 
 ## function implementation
@@ -102,14 +101,14 @@ for il, (nLine, (LineName, hwLine)) in enumerate(sorted(hwLinesMap.items())):
     
 # # Vigila amb el sorting dels canal per demux... segurament dependrà de l'ordre de les lines
 
-if GenInvert:
-    for line in DOut[0:-1:2, :]:
-        if True in line:
-            SortDInds.append(np.where(line))
-else:
-    for line in DOut:
-        if True in line:
-            SortDInds.append(np.where(line))
+# if GenInvert:
+#     for line in DOut[0:-1:2, :]:
+#         if True in line:
+#             SortDInds.append(np.where(line))
+# else:
+#     for line in DOut:
+#         if True in line:
+#             SortDInds.append(np.where(line))
 
 SortDIndsL = [inds for inds in SortDInds]
     
