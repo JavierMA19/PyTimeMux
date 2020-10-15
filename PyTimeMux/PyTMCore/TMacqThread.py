@@ -136,6 +136,9 @@ class SampSetParam(pTypes.GroupParameter):
     Rows = []
     Acq = {}
     HwSettings = {}
+    Ao = {}
+    Ao2 = None
+    Ao3 = None
 
     def __init__(self, **kwargs):
         super(SampSetParam, self).__init__(**kwargs)
@@ -152,7 +155,9 @@ class SampSetParam(pTypes.GroupParameter):
         self.Config = self.ChsConfig.param('Board')
         self.RowChannels = self.ChsConfig.param('Channels')
         self.ColChannels = self.ChsConfig.param('DigColumns')
-        
+
+        self.Vds = self.SampSet.param('Vds')
+        self.Vgs = self.SampSet.param('Vgs')
 
         # Init Settings
         self.on_Acq_Changed()
@@ -247,8 +252,17 @@ class SampSetParam(pTypes.GroupParameter):
     def on_Ao_Changed(self):
         self.Ao = {}
         for p in self.AnalogOutputs.children():
-                self.Ao[p.name()] = p.value()
+            print(p.name(), 'namep')
+            self.Ao[p.name()] = p.value()
+
         self.NewConf.emit()
+        if 'ChAo2' in self.Ao:
+            self.Ao2 = self.AnalogOutputs.param('ChAo2')
+        else: self.Ao2 = None
+        if 'ChAo3' in self.Ao:       
+            self.Ao3 = self.AnalogOutputs.param('ChAo3')
+        else:
+            self.Ao3 = None
 
     def GetRowNames(self):
         Ind = 0

@@ -62,6 +62,9 @@ class MainWindow(Qt.QWidget):
         self.SamplingPar.Fs.sigValueChanged.connect(self.on_FsChanged)
         self.SamplingPar.FsxCh.sigValueChanged.connect(self.on_FsxChChanged)
 
+        self.SamplingPar.Vds.sigValueChanged.connect(self.on_BiasChanged)
+        self.SamplingPar.Vgs.sigValueChanged.connect(self.on_BiasChanged)
+
         self.PlotParams = TimePltPars(name='TimePlt',
                               title='Time Plot Options')
 
@@ -100,6 +103,21 @@ class MainWindow(Qt.QWidget):
         self.on_FsxChChanged()
         self.on_NewConf()
 
+    def on_BiasChanged(self):
+        if self.threadAcq:
+            Vgs = self.SamplingPar.Vgs.value()
+            Vds = self.SamplingPar.Vds.value()
+            Ao2 = None
+            Ao3 = None
+            if self.SamplingPar.Ao2:
+                Ao2 = self.SamplingPar.Ao2.value()
+            if self.SamplingPar.Ao3:
+                Ao3 = self.SamplingPar.Ao3.value()
+            self.threadAcq.DaqInterface.SetBias(Vgs=Vgs,
+                                                Vds=Vds,
+                                                ChAo2=Ao2,
+                                                ChAo3=Ao3)
+
     def on_FsChanged(self):
         self.RawPlotParams.param('Fs').setValue(self.SamplingPar.Fs.value())
 
@@ -108,41 +126,6 @@ class MainWindow(Qt.QWidget):
         self.PlotParams.param('Fs').setValue(self.SamplingPar.FsxCh.value())
         self.PsdPlotParams.param('Fs').setValue(self.SamplingPar.FsxCh.value())
 
-    def on_pars_changed(self, param, changes):
-        print("tree changes:")
-        for param, change, data in changes:
-            path = self.Parameters.childPath(param)
-            if path is not None:
-                childName = '.'.join(path)
-            else:
-                childName = param.name()
-        print('  parameter: %s' % childName)
-        print('  change:    %s' % change)
-        print('  data:      %s' % str(data))
-        print('  ----------')
-
-        if childName == 'SampSettingConf.Sampling Settings.Vgs':
-            if self.threadAcq:
-                Vds = self.threadAcq.DaqInterface.Vds
-                self.threadAcq.DaqInterface.SetBias(Vgs=data, Vds=Vds)
-
-        if childName == 'SampSettingConf.Sampling Settings.Vds':
-            if self.threadAcq:
-                Vgs = self.threadAcq.DaqInterface.Vgs
-                self.threadAcq.DaqInterface.SetBias(Vgs=Vgs, Vds=data)
-
-        if childName == 'SampSettingConf.Sampling Settings.ChAo2':
-            if self.threadAcq:
-                Vds = self.threadAcq.DaqInterface.Vds
-                Vgs = self.threadAcq.DaqInterface.Vgs
-                self.threadAcq.DaqInterface.SetBias(Vgs=Vgs, Vds=Vds, ChAo2=data)
-
-        if childName == 'SampSettingConf.Sampling Settings.ChAo3':
-            if self.threadAcq:
-                Vgs = self.threadAcq.DaqInterface.Vgs
-                Vds = self.threadAcq.DaqInterface.Vds
-                self.threadAcq.DaqInterface.SetBias(Vgs=Vgs, Vds=Vds, ChAo3=data)
-
     def on_NewPSDConf(self):
         if self.threadPSDPlotter is not None:
             nFFT = self.PsdPlotParams.param('nFFT').value()
@@ -150,11 +133,17 @@ class MainWindow(Qt.QWidget):
             self.threadPSDPlotter.InitBuffer(nFFT=nFFT, nAvg=nAvg)
 
     def on_NewConf(self):
+        print('NewConf')
         self.PlotParams.SetChannels(self.SamplingPar.GetChannelsNames())
         self.RawPlotParams.SetChannels(self.SamplingPar.GetRowNames())
         self.PsdPlotParams.ChannelConf = self.PlotParams.ChannelConf
         nChannels = self.PlotParams.param('nChannels').value()
         self.PsdPlotParams.param('nChannels').setValue(nChannels)
+        if self.SamplingPar.Ao2:
+            self.SamplingPar.Ao2.sigValueChanged.connect(self.on_BiasChanged)
+        if self.SamplingPar.Ao3:
+            self.SamplingPar.Ao3.sigValueChanged.connect(self.on_BiasChanged)
+
 
     def on_NewPlotConf(self):
         if self.threadPlotter is not None:

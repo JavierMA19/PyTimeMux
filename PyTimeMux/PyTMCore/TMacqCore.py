@@ -191,8 +191,7 @@ class ChannelsConfig():
                 Cout = Lout        
             DOut = np.vstack((DOut, Cout)) if DOut.size else Cout
 
-        SortDIndsL = [inds for inds in SortDInds] 
-        Dout = DOut.astype(np.uint8)
+        SortDIndsL = [inds for inds in SortDInds]
 
         self.SortDInds = SortDInds
         self.DigitalOutputs.SetContSignal(Signal=DOut.astype(np.uint8))
