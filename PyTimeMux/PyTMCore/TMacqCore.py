@@ -149,9 +149,9 @@ class ChannelsConfig():
         self.VdsOut.SetVal(Vds)
         self.VsOut.SetVal(-Vgs)
         if self.AO2Out:
-            self.AO2Out.SetVal(ChAo2)
+            self.AO2Out.SetVal(ChAo2-Vgs)
         if self.AO3Out:
-            self.AO3Out.SetVal(ChAo3)
+            self.AO3Out.SetVal(ChAo3-Vgs)
         self.BiasVd = Vds-Vgs
         self.Vgs = Vgs
         self.Vds = Vds
