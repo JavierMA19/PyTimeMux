@@ -56,16 +56,28 @@ doColumns = HwMap['ColOuts']
 # columns to Mux
 DigColumns = (
                 'Col01',
-                'Col02',
+                'Col03',
+                'Col04',
                 )
 
 ## function implementation
 ## def SetDigitalOutputs(self, nSampsCo):
 
+IndexDigitalLines = {}
 hwLinesMap = {}
+i = 0
 for ColName, hwLine in doColumns.items():
+    print(ColName)
     il = int(hwLine[0][4:])
     hwLinesMap[il] = (ColName, hwLine)
+
+j = 0
+NewInd = {}
+for i, c in sorted(hwLinesMap.items()):
+    for n in DigColumns:
+        if n == c[0]:
+            NewInd[j] = c[0]
+            j += 1
 
 # Gen inverted control output, should be the next one of the digital line ('lineX', 'lineX+1')
 if len(doColumns[ColName]) > 1:
