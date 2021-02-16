@@ -51,7 +51,7 @@ class ChannelsConfig():
             sortindex += 1
         print('Input ai', InChans)
 
-        self.AnalogInputs = DaqInt.ReadAnalog(InChans=InChans)
+        self.AnalogInputs = DaqInt.ReadAnalog(InChans=InChans, Range=self.Range)
         # events linking
         self.AnalogInputs.EveryNEvent = self.EveryNEventCallBack
         self.AnalogInputs.DoneEvent = self.DoneEventCallBack
@@ -84,7 +84,8 @@ class ChannelsConfig():
     def __init__(self, Channels, DigColumns,
                  AcqDC=True, AcqAC=True,
                  ChVds='ao0', ChVs='ao1',
-                 ACGain=1.1e5, DCGain=10e3, Board='MB41'):
+                 ACGain=1.1e5, DCGain=10e3, Board='MB41',
+                 DynamicRange=None):
         print('InitChannels')
         # self._InitAnalogOutputs(ChVds=ChVds, ChVs=ChVs)
 
@@ -94,6 +95,7 @@ class ChannelsConfig():
         self.AcqDC = AcqDC
         self.ACGain = ACGain
         self.DCGain = DCGain
+        self.Range = DynamicRange
         print('Board---->', Board)
 
         self.MyConf = BoardConf.HwConfig[Board]
