@@ -128,7 +128,6 @@ class ChannelsConfig():
 
         self._InitAnalogInputs()
         self.DigColumns = sorted(DigColumns)
-        
         if self.doColumns:
             if self.doColumns['Col01'] is None:
                 self._InitDecoderOutputs()
@@ -237,8 +236,8 @@ class ChannelsConfig():
         index = 0
         DigIndex = 0
         
-        for n, i in doColumns.items():
-            if n in DigColumns:
+        for n, i in self.doColumns.items():
+            if n in self.DigColumns:
                 Lout = np.ones((nSampsCo, 5))
         
                 IndexDigitalLines[DigIndex] = n
@@ -248,7 +247,7 @@ class ChannelsConfig():
                 DigIndex += 1
             index += 1
         print(IndexDigitalLines, 'IndexDigitalLines')
-        return DOut.transpose(), IndexDigitalLines
+        # return DOut.transpose(), IndexDigitalLines
         self.SortDInds = IndexDigitalLines
         self.DigitalOutputs.SetContSignal(Signal=DOut.astype(np.uint8))
 
