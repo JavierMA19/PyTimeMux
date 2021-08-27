@@ -48,7 +48,7 @@ HwMap = {'aiChannels': {'Ch01': ('ai0', 'ai8'),
 import numpy as np
 
 # samples per column
-nSampsCo = 3
+nSampsCo = 4
 
 # hardware mapping
 doColumns = HwMap['ColOuts']

@@ -21,6 +21,7 @@ class ChannelsConfig():
     MyConf = None
     AO2Out = None
     AO3Out = None
+    Digital = None
 
     # Events list
     DataEveryNEvent = None
@@ -36,18 +37,23 @@ class ChannelsConfig():
         index = 0
         sortindex = 0
         for ch in self.ChNamesList:
-            if self.AcqDC:
-                InChans.append(self.aiChannels[ch][0])
-                self.DCChannelIndex[ch] = (index, sortindex)
-                index += 1
-                print(ch, ' DC -->', self.aiChannels[ch][0])
-                print('SortIndex ->', self.DCChannelIndex[ch])
-            if self.AcqAC:
-                InChans.append(self.aiChannels[ch][1])
-                self.ACChannelIndex[ch] = (index, sortindex)
-                index += 1
-                print(ch, ' AC -->', self.aiChannels[ch][1])
-                print('SortIndex ->', self.ACChannelIndex[ch])
+            if self.Inds <= 1:
+                InChans.append(self.aiChannels[ch])
+                self.DCChannelIndex[ch] = (sortindex, sortindex)
+                self.ACChannelIndex[ch] = (sortindex, sortindex)
+            else:
+                if self.AcqDC:
+                    InChans.append(self.aiChannels[ch][0])
+                    self.DCChannelIndex[ch] = (index, sortindex)
+                    index += 1
+                    print(ch, ' DC -->', self.aiChannels[ch][0])
+                    print('SortIndex ->', self.DCChannelIndex[ch])
+                if self.AcqAC:
+                    InChans.append(self.aiChannels[ch][1])
+                    self.ACChannelIndex[ch] = (index, sortindex)
+                    index += 1
+                    print(ch, ' AC -->', self.aiChannels[ch][1])
+                    print('SortIndex ->', self.ACChannelIndex[ch])
             sortindex += 1
         print('Input ai', InChans)
 
@@ -70,6 +76,10 @@ class ChannelsConfig():
         print(DOChannels)
 
         self.DigitalOutputs = DaqInt.WriteDigital(Channels=DOChannels)
+
+    def _InitDecoderOutputs(self):
+        print('InitDecoderOutputs')
+        self.DigitalOutputs = DaqInt.WriteDigital(Channels=['port0/line0:4', ])
 
     def _InitAnalogOutputs(self, ChVds, ChVs, ChAo2, ChAo3):
         print('ChVds ->', ChVds)
@@ -108,9 +118,22 @@ class ChannelsConfig():
                                 ChAo3=self.aoChannels['ChAo3'],
                                 )
 
+        if Board == 'MainBoard_Discrete':
+            print('INDEX===1')
+            self.Inds = 1  # Modify name TODO
+            self.Digital = 'Decoder'
+        else:
+            print('INDEX===2')
+            self.Inds = 2
+
         self._InitAnalogInputs()
         self.DigColumns = sorted(DigColumns)
-        self._InitDigitalOutputs()
+        
+        if self.doColumns:
+            if self.doColumns['Col01'] is None:
+                self._InitDecoderOutputs()
+            else:
+                self._InitDigitalOutputs()
 
         MuxChannelNames = []
         for Row in self.ChNamesList:
@@ -135,7 +158,10 @@ class ChannelsConfig():
             ChAo2 = None
             ChAo3 = None
         self.SetBias(Vgs=Vgs, Vds=Vds, ChAo2=ChAo2, ChAo3=ChAo3)
-        self.SetDigitalOutputs(nSampsCo=nSampsCo)
+        if self.Digital == 'Decoder':
+            self.GetDecoderSignal(nSampsCo=nSampsCo)
+        else:
+            self.SetDigitalOutputs(nSampsCo=nSampsCo)
         print('DSig set')
         self.nBlocks = nBlocks
         self.nSampsCo = nSampsCo
@@ -150,11 +176,15 @@ class ChannelsConfig():
               'Ao2 ->', ChAo2, 'Ao3 ->', ChAo3,)
         self.VdsOut.SetVal(Vds)
         self.VsOut.SetVal(-Vgs)
+        self.BiasVd = Vds-Vgs
         if self.AO2Out:
             self.AO2Out.SetVal(ChAo2-Vgs)
         if self.AO3Out:
-            self.AO3Out.SetVal(ChAo3-Vgs)
-        self.BiasVd = Vds-Vgs
+            if self.Digital == 'Decoder':    
+                self.AO3Out.SetVal(self.BiasVd)
+            else:
+                self.AO3Out.SetVal(ChAo3-Vgs)
+        
         self.Vgs = Vgs
         self.Vds = Vds
 
@@ -198,6 +228,36 @@ class ChannelsConfig():
         self.SortDInds = SortDInds
         self.DigitalOutputs.SetContSignal(Signal=DOut.astype(np.uint8))
 
+    def GetDecoderSignal(self, nSampsCo):
+        Decoder = self.DecoderDigital(5)
+        Dec = np.array(Decoder, dtype=np.uint8)
+        DOut = np.array([])
+        IndexDigitalLines = {}
+
+        index = 0
+        DigIndex = 0
+        
+        for n, i in doColumns.items():
+            if n in DigColumns:
+                Lout = np.ones((nSampsCo, 5))
+        
+                IndexDigitalLines[DigIndex] = n
+                Lout = Lout*Dec[index]
+                DOut = np.vstack((DOut, Lout)) if DOut.size else Lout
+        
+                DigIndex += 1
+            index += 1
+        print(IndexDigitalLines, 'IndexDigitalLines')
+        return DOut.transpose(), IndexDigitalLines
+        self.SortDInds = IndexDigitalLines
+        self.DigitalOutputs.SetContSignal(Signal=DOut.astype(np.uint8))
+
+    def DecoderDigital(self, n):
+        if n < 1:
+            return[[]]
+        subtable = self.DecoderDigital(n-1)
+        return [row + [v] for row in subtable for v in [0, 1]]
+
     def _SortChannels(self, data, SortDict):
         # Sort by aianalog input
         (samps, inch) = data.shape
@@ -228,8 +288,13 @@ class ChannelsConfig():
             if self.AcqDC:
                 aiDataDC, MuxDataDC = self._SortChannels(Data,
                                                          self.DCChannelIndex)
-                aiDataDC = (aiDataDC-self.BiasVd) / self.DCGain
-                MuxDataDC = (MuxDataDC-self.BiasVd) / self.DCGain
+                if self.Digital == 'Decoder':
+                    aiDataDC = aiDataDC/self.DCGain*10
+                    MuxDataDC = MuxDataDC/self.DCGain*10
+                else:
+                    aiDataDC = (aiDataDC-self.BiasVd) / self.DCGain
+                    MuxDataDC = (MuxDataDC-self.BiasVd) / self.DCGain
+
             if self.AcqAC:
                 aiDataAC, MuxDataAC = self._SortChannels(Data,
                                                          self.ACChannelIndex)
